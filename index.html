@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asistente IA — Empresas Ruiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --border: #E2DDD6;
+    --accent-law: #1C3A5E;
+    --accent-law-light: #EBF0F7;
+    --accent-gest: #2D5F4E;
+    --accent-gest-light: #EAF3EE;
+    --bubble-user-law: #1C3A5E;
+    --bubble-user-gest: #2D5F4E;
+    --bubble-bot: #F0EDE8;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* PORTADA */
+  #portada {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .logo-mark {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+  }
+
+  .logo-mark svg { width: 28px; height: 28px; fill: white; }
+
+  .portada-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .portada-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .portada-sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 320px;
+    line-height: 1.6;
+    margin: 0 auto 3rem;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  @media (max-width: 400px) {
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+
+  .portal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem 1.25rem;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .portal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .portal-card.law::before { background: var(--accent-law); }
+  .portal-card.gest::before { background: var(--accent-gest); }
+
+  .portal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+  .card-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 20px;
+  }
+
+  .law .card-icon { background: var(--accent-law-light); }
+  .gest .card-icon { background: var(--accent-gest-light); }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .card-arrow {
+    position: absolute;
+    bottom: 1.25rem; right: 1.25rem;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .portada-footer {
+    margin-top: 3rem;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* SECCIÓN ASISTENTE */
+  .section {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .section.active { display: flex; }
+
+  .section-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .back-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .header-avatar {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .law-section .header-avatar { background: var(--accent-law-light); }
+  .gest-section .header-avatar { background: var(--accent-gest-light); }
+
+  .header-info { flex: 1; }
+  .header-name { font-size: 14px; font-weight: 500; }
+  .header-status { font-size: 11px; color: var(--muted); }
+
+  .chat-area {
+    flex: 1;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+  }
+
+  .welcome-msg {
+    background: var(--bubble-bot);
+    border-radius: 4px 16px 16px 16px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    max-width: 88%;
+  }
+
+  .faq-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .faq-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    transition: background 0.15s;
+    line-height: 1.4;
+  }
+
+  .faq-chip:hover { background: var(--bg); }
+
+  .bubble-user {
+    align-self: flex-end;
+    padding: 10px 14px;
+    border-radius: 16px 16px 4px 16px;
+    font-size: 14px;
+    max-width: 80%;
+    color: white;
+    line-height: 1.5;
+  }
+
+  .law-section .bubble-user { background: var(--accent-law); }
+  .gest-section .bubble-user { background: var(--accent-gest); }
+
+  .bubble-bot {
+    align-self: flex-start;
+    background: var(--bubble-bot);
+    border-radius: 4px 16px 16px 16px;
+    padding: 12px 14px;
+    font-size: 14px;
+    max-width: 88%;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .bubble-bot .sender {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .typing {
+    display: flex; gap: 4px; align-items: center; padding: 4px 0;
+  }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted);
+    animation: bounce 1s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  .input-area {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    display: flex;
+    gap: 8px;
+    position: sticky;
+    bottom: 0;
+  }
+
+  .input-area input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+
+  .input-area input:focus { border-color: #aaa; }
+
+  .send-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+
+  .law-section .send-btn { background: var(--accent-law); }
+  .gest-section .send-btn { background: var(--accent-gest); }
+  .send-btn:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div id="portada">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+  </div>
+  <p class="portada-eyebrow">Demostración de asistente IA</p>
+  <h1 class="portada-title">¿En qué podemos ayudarte?</h1>
+  <p class="portada-sub">Selecciona el servicio que necesitas y nuestro asistente te atenderá al instante.</p>
+
+  <div class="cards-grid">
+    <div class="portal-card law" onclick="openSection('law')">
+      <div class="card-icon">⚖️</div>
+      <div class="card-title">Bufete de abogados</div>
+      <div class="card-desc">Consultas legales, contratos, comunidades de vecinos</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="portal-card gest" onclick="openSection('gest')">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Gestoría</div>
+      <div class="card-desc">Autónomos, empresas, fiscal, laboral, trámites</div>
+      <div class="card-arrow">→</div>
+    </div>
+  </div>
+
+  <p class="portada-footer">Asistente de demostración · Empresas Ruiz</p>
+</div>
+
+<!-- SECCIÓN BUFETE -->
+<div id="law-section" class="section law-section">
+  <div class="section-header">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="header-avatar">⚖️</div>
+    <div class="header-info">
+      <div class="header-name">Bengoa & Ruiz Asociados</div>
+      <div class="header-status">Asistente disponible</div>
+    </div>
+  </div>
+  <div class="chat-area" id="law-chat">
+    <div class="welcome-msg">
+      Hola, soy el asistente de <strong>Bengoa & Ruiz Asociados</strong>. Estoy aquí para resolver tus dudas sobre servicios jurídicos, contratos y comunidades de vecinos.<br><br>¿Sobre qué te puedo ayudar?
+    </div>
+    <div class="faq-chips" id="law-chips"></div>
+  </div>
+  <div class="input-area">
+    <input type="text" id="law-input" placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') sendMsg('law')" />
+    <button class="send-btn" onclick="sendMsg('law')">↑</button>
+  </div>
+</div>
+
+<!-- SECCIÓN GESTORÍA -->
+<div id="gest-section" class="section gest-section">
+  <div class="section-header">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="header-avatar">📊</div>
+    <div class="header-info">
+      <div class="header-name">Gestoría OTADI</div>
+      <div class="header-status">Asistente disponible</div>
+    </div>
+  </div>
+  <div class="chat-area" id="gest-chat">
+    <div class="welcome-msg">
+      Hola, soy el asistente de <strong>Gestoría OTADI</strong>. Puedo ayudarte con dudas sobre autónomos, declaraciones, trámites laborales y fiscales.<br><br>¿Qué necesitas saber?
+    </div>
+    <div class="faq-chips" id="gest-chips"></div>
+  </div>
+  <div class="input-area">
+    <input type="text" id="gest-input" placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') sendMsg('gest')" />
+    <button class="send-btn" onclick="sendMsg('gest')">↑</button>
+  </div>
+</div>
+
+<script>
+const data = {
+  law: [
+    {
+      q: "¿Qué es una comunidad de vecinos?",
+      a: "Una comunidad de vecinos es la organización legal que agrupa a los propietarios de un edificio o urbanización para gestionar los elementos comunes. Se rige por la Ley de Propiedad Horizontal (LPH) y sus decisiones se toman en junta de propietarios. Cualquier propietario tiene derecho a asistir y votar. Si necesita asesoramiento sobre su comunidad, en Bengoa & Ruiz somos especialistas."
+    },
+    {
+      q: "¿Puedo reclamar derramas extraordinarias?",
+      a: "Depende del caso. Si la derrama se aprobó en junta con el quórum necesario, todos los propietarios están obligados a pagarla, incluidos los que votaron en contra. Sin embargo, si hubo irregularidades en la convocatoria o en la votación, puede impugnarse judicialmente en un plazo de tres meses. Le recomendamos consultarnos para analizar su caso concreto."
+    },
+    {
+      q: "¿Qué necesito para hacer un contrato de arrendamiento?",
+      a: "Para redactar un contrato de arrendamiento necesitamos: DNI de propietario e inquilino, referencia catastral del inmueble, precio del alquiler y forma de pago, duración del contrato, y si habrá fianza y su importe (obligatoria por ley: 1 mes en vivienda, 2 en uso distinto). Nosotros lo redactamos adaptado a su situación y con todas las cláusulas de protección necesarias."
+    },
+    {
+      q: "¿Cuánto tarda un desahucio?",
+      a: "En España, un procedimiento de desahucio por impago tarda entre 4 y 8 meses en condiciones normales, aunque puede alargarse si el inquilino presenta oposición o solicita prórroga por vulnerabilidad. Con una buena gestión procesal desde el inicio se puede acortar. En Bengoa & Ruiz llevamos este tipo de procedimientos de forma ágil y eficaz."
+    },
+    {
+      q: "¿Cómo impugno un acuerdo de la junta de vecinos?",
+      a: "Los acuerdos de junta pueden impugnarse ante los juzgados en un plazo de 3 meses (o 1 año si son contrarios al orden público). Hay que acreditar que el acuerdo es contrario a la ley, a los estatutos de la comunidad, o que resulta gravemente lesivo para los intereses comunitarios. Es fundamental actuar rápido por los plazos. Consúltenos sin compromiso."
+    }
+  ],
+  gest: [
+    {
+      q: "¿Cuándo se presenta el IVA trimestral?",
+      a: "El modelo 303 se presenta cuatro veces al año: del 1 al 20 de abril (1T), del 1 al 20 de julio (2T), del 1 al 20 de octubre (3T) y del 1 al 30 de enero (4T + resumen anual modelo 390). Si el día 20 cae en festivo o fin de semana, el plazo se amplía al siguiente día hábil. Desde OTADI te avisamos siempre con antelación."
+    },
+    {
+      q: "¿Qué pasa si presento fuera de plazo?",
+      a: "Sin requerimiento previo de Hacienda, se aplica un recargo del 1% por cada mes de retraso hasta 12 meses. A partir del año, el recargo sube al 15% más intereses de demora. Si Hacienda te requiere antes de que presentes, la sanción puede ir del 50% al 150% de la cuota. Cuanto antes regularices la situación, mejor."
+    },
+    {
+      q: "¿Cuánto cotiza un autónomo en 2025?",
+      a: "Desde 2023 la cotización es por ingresos reales, con 15 tramos. La cuota mínima es de 200 €/mes (ingresos menores a 670 €/mes) y la máxima de 590 €/mes (ingresos mayores a 6.000 €/mes). Los nuevos autónomos tienen tarifa plana de 80 €/mes durante los primeros 12 meses. Puedes ajustar tu base cada dos meses según evolucionen tus ingresos."
+    },
+    {
+      q: "¿Me puedo deducir el coche?",
+      a: "Depende de tu actividad. Si el vehículo es de uso exclusivamente profesional (transporte, mensajería...) puedes deducir el 100%. En la mayoría de casos, Hacienda acepta el 50% del IVA para uso mixto, pero en IRPF es muy restrictivo y exige exclusividad. Te recomendamos consultarlo con nosotros antes de aplicar la deducción para evitar problemas en una inspección."
+    },
+    {
+      q: "¿Qué documentos necesito para la renta?",
+      a: "Los más habituales: DNI, número de cuenta, certificado de retenciones del trabajo, datos de inmuebles (referencia catastral), certificado del préstamo hipotecario si lo hay, justificantes de donaciones, y certificados de rendimientos de cuentas y fondos. Si eres autónomo, el resumen de ingresos y gastos del año. Si ya eres cliente de OTADI, nosotros ya tenemos la mayoría — contáctanos para confirmar."
+    }
+  ]
+};
+
+function renderChips(type) {
+  const container = document.getElementById(type + '-chips');
+  data[type].forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'faq-chip';
+    btn.textContent = item.q;
+    btn.onclick = () => showAnswer(type, item.q, item.a);
+    container.appendChild(btn);
+  });
+}
+
+function openSection(type) {
+  document.getElementById('portada').style.display = 'none';
+  document.getElementById(type + '-section').classList.add('active');
+}
+
+function goBack() {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('portada').style.display = 'flex';
+}
+
+function showAnswer(type, question, answer) {
+  const chat = document.getElementById(type + '-chat');
+  const chips = document.getElementById(type + '-chips');
+  if (chips) chips.remove();
+
+  const uBubble = document.createElement('div');
+  uBubble.className = 'bubble-user';
+  uBubble.textContent = question;
+  chat.appendChild(uBubble);
+
+  const typing = document.createElement('div');
+  typing.className = 'bubble-bot';
+  typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    typing.innerHTML = '<span class="sender">Asistente</span>' + answer;
+    chat.scrollTop = chat.scrollHeight;
+  }, 900);
+}
+
+function sendMsg(type) {
+  const input = document.getElementById(type + '-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  showAnswer(type, q, 'Esta consulta requiere atención personalizada. Uno de nuestros gestores se pondrá en contacto contigo en menos de 24 horas. También puedes llamarnos directamente en horario de oficina.');
+}
+
+renderChips('law');
+renderChips('gest');
+</script>
+</body>
+</html>
